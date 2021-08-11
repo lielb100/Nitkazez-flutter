@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "240093152187",
+    "project_id": "nitkazez",
+    "storage_bucket": "nitkazez.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:240093152187:android:ddda70530a0842d508fa9e",
+        "android_client_info": {
+          "package_name": "com.liel.nitkazez"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "240093152187-9r4v33e26ft41j63iasum5cub5el1664.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.liel.nitkazez",
+            "certificate_hash": "855cb91ef15f39d88aeb9a893a41b335af06a64c"
+          }
+        },
+        {
+          "client_id": "240093152187-0ffe0fhkff0hal2vskbeu9hc335hkni6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhREWaeZ10q9-YWxcSPm1p0rV2BS0ZfnI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "240093152187-0ffe0fhkff0hal2vskbeu9hc335hkni6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

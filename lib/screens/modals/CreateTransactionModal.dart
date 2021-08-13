@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:nitkazez/models/Ledger.dart';
 import 'package:nitkazez/models/Transaction.dart' as local;
@@ -7,10 +8,9 @@ import 'package:nitkazez/providers/UserProvider.dart';
 import 'package:provider/provider.dart';
 
 class CreateTransactionModal extends StatefulWidget {
-  final Map<String, dynamic> ledger;
+  final Ledger ledger;
 
-  const CreateTransactionModal(
-      {Key? key, required Map<String, dynamic> this.ledger})
+  const CreateTransactionModal({Key? key, required this.ledger})
       : super(key: key);
 
   @override
@@ -29,16 +29,23 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
     final userRef = FirebaseFirestore.instance
         .collection("users")
         .doc(userChange.currentUser.uid);
-
-    final List<DropdownMenuItem<DocumentReference<Map<String, dynamic>>>>
-        _allOtherUsers = widget.ledger["members"]
-            .where((element) => element != userRef)
-            .map((e) async => DropdownMenuItem(
-                  value: e,
-                  child: Text((await e.get()).data()!["userName"]),
-                ))
-            .cast<DropdownMenuItem<DocumentReference<Map<String, dynamic>>>>()
-            .toList();
+    // List<DropdownMenuItem> _allOtherUsers = widget.ledger.members
+    //     .where((element) => element != userRef)
+    //     .map((DocumentReference<Map<String, dynamic>> e) =>
+    //         FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+    //             future: e.get(),
+    //             builder: (context, snapshot) {
+    //               return snapshot.hasData
+    //                   ? DropdownMenuItem(
+    //                       value: e,
+    //                       child: Text(snapshot.data!.data()!["userName"]),
+    //                     )
+    //                   : DropdownMenuItem(
+    //                       value: e,
+    //                       child: CircularProgressIndicator(),
+    //                     );
+    //             }) as DropdownMenuItem<DocumentSnapshot<Map<String, dynamic>>>)
+    //     .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -68,16 +75,19 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
                 FormBuilderTextField(
                   name: "amount",
                   decoration: InputDecoration(labelText: "Amount of money"),
-                  onChanged: (value) {
+                  onSaved: (value) {
                     setState(() {
-                      if (value != "")
+                      if (value != "") {
                         transaction.amount = double.parse(value!);
+                      }
                     });
                   },
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.integer(context),
+                    FormBuilderValidators.numeric(context),
                     FormBuilderValidators.max(context, 99999),
                     FormBuilderValidators.minLength(context, 1),
+                    FormBuilderValidators.min(context, 1),
                   ]),
                   keyboardType: TextInputType.number,
                 ),
@@ -98,31 +108,33 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
                   decoration: InputDecoration(labelText: "Date and Time"),
                   initialDate: DateTime.now(),
                   initialTime: TimeOfDay.now(),
-                  onChanged: (value) {
+                  firstDate: DateTime.now().subtract(Duration(days: 365)),
+                  lastDate: DateTime.now(),
+                  onSaved: (value) {
                     setState(() {
                       Timestamp.fromDate(value!);
                     });
                   },
                 ),
-                FormBuilderDropdown(
-                  name: "creditor/debtor",
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(context),
-                  ]),
-                  decoration: InputDecoration(
-                      labelText: transaction.creditor == userRef
-                          ? "Debtor"
-                          : "Creditor"),
-                  allowClear: false,
-                  enabled: this._enableDropDown ? true : false,
-                  items: _allOtherUsers,
-                ),
+                // FormBuilderDropdown(
+                //   name: "creditor/debtor",
+                //   validator: FormBuilderValidators.compose([
+                //     FormBuilderValidators.required(context),
+                //   ]),
+                //   decoration: InputDecoration(
+                //       labelText: transaction.creditor == userRef
+                //           ? "Debtor"
+                //           : "Creditor"),
+                //   allowClear: false,
+                //   enabled: this._enableDropDown ? true : false,
+                //   items: _allOtherUsers,
+                // ),
                 FormBuilderSwitch(
                   name: "debtor or creditor",
                   title: Text("Are you the creditor or the debtor?"),
                   initialValue: true,
                   onChanged: (value) {
-                    setState(() async {
+                    setState(() {
                       this._enableDropDown = true;
                       var you = FirebaseFirestore.instance
                           .collection('users')

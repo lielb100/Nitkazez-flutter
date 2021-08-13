@@ -70,7 +70,6 @@ class UserProvider extends ChangeNotifier {
 
   double get balance {
     double balance = this.currentUser.balance;
-    notifyListeners();
     return balance;
   }
 }

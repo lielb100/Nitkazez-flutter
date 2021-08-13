@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nitkazez/components/TransactionList.dart';
@@ -27,7 +29,8 @@ class _LedgerScreenState extends State<LedgerScreen> {
             context,
             MaterialPageRoute(
               builder: (BuildContext context) => CreateTransactionModal(
-                ledger: {},
+                ledger: Ledger.fromSnapshot(widget.ledger.id,
+                    widget.ledger.data() as Map<String, dynamic>),
               ),
               fullscreenDialog: true,
             ),

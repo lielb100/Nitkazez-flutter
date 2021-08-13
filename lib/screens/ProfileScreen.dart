@@ -26,15 +26,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: Text("Info"),
           centerTitle: true,
         ),
-        body: Center(
-          child: Column(
-            children: [
-              Text(
-                userChange.currentUser.userName,
-                style: TextStyle(fontSize: 30),
-              ),
-              editMode(context)
-            ],
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Column(
+              children: [
+                Text(
+                  userChange.currentUser.userName,
+                  style: TextStyle(fontSize: 30),
+                ),
+                editMode(context),
+                Text("Balance:"),
+                Text(widget.user!.balance.toString())
+              ],
+            ),
           ),
         ));
   }
@@ -177,10 +182,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: Text("Info"),
           centerTitle: true,
         ),
-        body: Center(
-          child: Container(
-            child: Text(widget.user!.userName),
-          ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Text("Balance:"), Text(widget.user!.balance.toString())],
         ));
   }
 

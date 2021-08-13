@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nitkazez/components/TransactionTile.dart';
+import '../models/Transaction.dart' as local;
 import 'package:nitkazez/providers/UserProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -35,6 +37,14 @@ class _TransactionListState extends State<TransactionList> {
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
+              return TransactionTile(
+                  transaction:
+                      local.Transaction.fromSnapshot(document.id, data));
+            }).toList(),
+
+            /*           children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data() as Map<String, dynamic>;
               String yourUid = userChange.currentUser.uid;
               DocumentReference<Map<String, dynamic>> creditorRef =
                   data["creditor"];
@@ -62,7 +72,7 @@ class _TransactionListState extends State<TransactionList> {
                   },
                 ),
               );
-            }).toList(),
+            }).toList(),*/
           );
         });
   }

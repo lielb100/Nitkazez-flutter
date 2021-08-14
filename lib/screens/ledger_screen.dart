@@ -1,10 +1,8 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nitkazez/components/TransactionList.dart';
-import 'package:nitkazez/models/Ledger.dart';
-import 'package:nitkazez/screens/modals/CreateTransactionModal.dart';
+import 'package:nitkazez/components/transaction_list.dart';
+import 'package:nitkazez/models/ledger.dart';
+import 'package:nitkazez/screens/modals/create_transaction_modal.dart';
 
 class LedgerScreen extends StatefulWidget {
   const LedgerScreen({Key? key, required this.ledger}) : super(key: key);
@@ -18,7 +16,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Transactions"),
+        title: const Text("Transactions"),
       ),
       body: TransactionList(
         ledgerRefrence: widget.ledger.reference,
@@ -36,7 +34,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
             ),
           );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

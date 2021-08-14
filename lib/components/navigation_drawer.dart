@@ -1,15 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nitkazez/screens/InfoScreen.dart';
-import 'package:nitkazez/screens/ProfileScreen.dart';
-import 'package:nitkazez/screens/SettingsScreen.dart';
+import 'package:nitkazez/screens/info_screen.dart';
+import 'package:nitkazez/screens/profile_screen.dart';
+import 'package:nitkazez/screens/settings_screen.dart';
 
 class NavigationDrawer extends StatelessWidget {
-  final padding = EdgeInsets.symmetric(horizontal: 20);
+  final padding = const EdgeInsets.symmetric(horizontal: 20);
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
-    final urlImage =
+    const urlImage =
         'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
     return Drawer(
       child: Material(
@@ -21,7 +21,7 @@ class NavigationDrawer extends StatelessWidget {
               phoneNumber: _auth.currentUser!.phoneNumber,
               onClicked: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => ProfileScreen(),
+                  builder: (context) => const ProfileScreen(),
                 ),
               ),
             ),
@@ -80,7 +80,7 @@ class NavigationDrawer extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => ProfileScreen(),
+          builder: (context) => const ProfileScreen(),
         ));
         break;
       case 1:
@@ -90,7 +90,7 @@ class NavigationDrawer extends StatelessWidget {
         break;
       case 2:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => InfoScreen(),
+          builder: (context) => const InfoScreen(),
         ));
         break;
     }
@@ -103,16 +103,16 @@ class NavigationDrawer extends StatelessWidget {
       InkWell(
         onTap: onClicked,
         child: Container(
-          padding: padding.add(EdgeInsets.symmetric(vertical: 40)),
+          padding: padding.add(const EdgeInsets.symmetric(vertical: 40)),
           child: Row(
             children: [
               CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage)),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               Text(
                 phoneNumber!,
-                style: TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20),
               ),
             ],
           ),

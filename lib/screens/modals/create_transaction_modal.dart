@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:nitkazez/models/Ledger.dart';
-import 'package:nitkazez/models/Transaction.dart' as local;
-import 'package:nitkazez/providers/UserProvider.dart';
+import 'package:nitkazez/models/ledger.dart';
+import 'package:nitkazez/models/transaction.dart' as local;
+import 'package:nitkazez/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class CreateTransactionModal extends StatefulWidget {
@@ -19,16 +19,14 @@ class CreateTransactionModal extends StatefulWidget {
 
 class _CreateTransactionModalState extends State<CreateTransactionModal> {
   final _formkey = GlobalKey<FormBuilderState>();
-  bool _enableDropDown = false;
 
   late local.Transaction transaction = local.Transaction.empty();
   final List<String> currencies = ["ILS", "USD", "GBP", "AUS"];
+
+  String creditorDebtorLabel = "";
   @override
   Widget build(BuildContext context) {
     final userChange = Provider.of<UserProvider>(context);
-    final userRef = FirebaseFirestore.instance
-        .collection("users")
-        .doc(userChange.currentUser.uid);
     // List<DropdownMenuItem> _allOtherUsers = widget.ledger.members
     //     .where((element) => element != userRef)
     //     .map((DocumentReference<Map<String, dynamic>> e) =>
@@ -47,9 +45,13 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
     //             }) as DropdownMenuItem<DocumentSnapshot<Map<String, dynamic>>>)
     //     .toList();
 
+    DocumentReference<Map<String, dynamic>> userRef() =>
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(userChange.currentUser.uid);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add a transaction"),
+        title: const Text("Add a transaction"),
       ),
       body: Column(
         children: [
@@ -59,9 +61,10 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
             child: Column(
               children: [
                 FormBuilderTextField(
-                  name: "Name",
-                  decoration: InputDecoration(labelText: "Name of transaction"),
-                  onChanged: (value) {
+                  name: "name",
+                  decoration:
+                      const InputDecoration(labelText: "Name of transaction"),
+                  onSaved: (value) {
                     setState(() {
                       transaction.transactionName = value ?? "";
                     });
@@ -74,7 +77,8 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
                 ),
                 FormBuilderTextField(
                   name: "amount",
-                  decoration: InputDecoration(labelText: "Amount of money"),
+                  decoration:
+                      const InputDecoration(labelText: "Amount of money"),
                   onSaved: (value) {
                     setState(() {
                       if (value != "") {
@@ -93,22 +97,22 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
                 ),
                 FormBuilderDropdown(
                   name: "currency",
-                  decoration: InputDecoration(labelText: "Currency"),
+                  decoration: const InputDecoration(labelText: "Currency"),
                   allowClear: false,
                   items: currencies
                       .map((currency) => DropdownMenuItem(
                             value: currency,
-                            child: Text('$currency'),
+                            child: Text(currency),
                           ))
                       .toList(),
                 ),
                 FormBuilderDateTimePicker(
                   name: "time",
                   inputType: InputType.both,
-                  decoration: InputDecoration(labelText: "Date and Time"),
+                  decoration: const InputDecoration(labelText: "Date and Time"),
                   initialDate: DateTime.now(),
                   initialTime: TimeOfDay.now(),
-                  firstDate: DateTime.now().subtract(Duration(days: 365)),
+                  firstDate: DateTime.now().subtract(const Duration(days: 365)),
                   lastDate: DateTime.now(),
                   onSaved: (value) {
                     setState(() {
@@ -116,35 +120,64 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
                     });
                   },
                 ),
-                // FormBuilderDropdown(
-                //   name: "creditor/debtor",
-                //   validator: FormBuilderValidators.compose([
-                //     FormBuilderValidators.required(context),
-                //   ]),
-                //   decoration: InputDecoration(
-                //       labelText: transaction.creditor == userRef
-                //           ? "Debtor"
-                //           : "Creditor"),
-                //   allowClear: false,
-                //   enabled: this._enableDropDown ? true : false,
-                //   items: _allOtherUsers,
-                // ),
-                FormBuilderSwitch(
-                  name: "debtor or creditor",
-                  title: Text("Are you the creditor or the debtor?"),
-                  initialValue: true,
+                FormBuilderRadioGroup<String>(
+                  name: "Creditor/Debtor switch",
+                  initialValue: null,
+                  decoration: const InputDecoration(
+                      labelText: "Are you the creditor or the debtor?"),
+                  options: const ["Creditor", "Debtor"]
+                      .map((val) => FormBuilderFieldOption(
+                            value: val,
+                            child: Text(val),
+                          ))
+                      .toList(growable: false),
                   onChanged: (value) {
                     setState(() {
-                      this._enableDropDown = true;
-                      var you = FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(userChange.currentUser.uid);
-                      value!
-                          ? transaction.creditor = you
-                          : transaction.debtor = you;
+                      switch (value) {
+                        case null:
+                          creditorDebtorLabel = "";
+                          break;
+                        case "Creditor":
+                          transaction.creditor = userRef();
+                          creditorDebtorLabel = "Creditor";
+                          break;
+                        default:
+                          transaction.debtor = userRef();
+                          creditorDebtorLabel = "Debtor";
+                      }
                     });
                   },
+                  separator: const VerticalDivider(
+                    width: 10,
+                    thickness: 5,
+                  ),
                 ),
+                if (creditorDebtorLabel != "")
+                  FormBuilderDropdown(
+                    name: "creditor/debtor",
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(context),
+                    ]),
+                    decoration: InputDecoration(labelText: creditorDebtorLabel),
+                    allowClear: false,
+                    // ignore: prefer_const_literals_to_create_immutables
+                    items: /*_allOtherUsers*/ [
+                      const DropdownMenuItem(child: Text("test"))
+                    ],
+                  ),
+
+                // FormBuilderSwitch(
+                //   name: "debtor or creditor",
+                //   title: const Text("Are you the creditor or the debtor?"),
+                //   initialValue: true,
+                //   onChanged: (value) {
+                //     setState(() {
+                //       value!
+                //           ? transaction.creditor = userRef
+                //           : transaction.debtor = userRef;
+                //     });
+                //   },
+                // ),
               ],
             ),
           ),
@@ -155,9 +188,37 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
                   color: Theme.of(context).colorScheme.secondary,
                   onPressed: () {
                     if (_formkey.currentState?.saveAndValidate() ?? false) {
+                      transaction.createdAt = Timestamp.now();
+                      transaction.amount =
+                          _formkey.currentState?.value["amount"];
+                      transaction.currency =
+                          _formkey.currentState?.value["currency"];
+                      transaction.time = _formkey.currentState?.value["time"];
+                      transaction.transactionName =
+                          _formkey.currentState?.value["name"];
+                      if (creditorDebtorLabel == "Creditor") {
+                        transaction.isCreditorApprovedAdded = true;
+                        transaction.debtor =
+                            _formkey.currentState?.value["creditor/debtor"];
+                      } else {
+                        transaction.isDebtorApprovedAdded = true;
+                        transaction.creditor =
+                            _formkey.currentState?.value["creditor/debtor"];
+                      }
+                      FirebaseFirestore.instance
+                          .collection("ledgers")
+                          .doc(widget.ledger.ledgerId)
+                          .collection("transactions")
+                          .add(transaction.toMap());
+                      //TODO Remove in prod
+                      // ignore: avoid_print
                       print(_formkey.currentState?.value);
                     } else {
+                      //TODO Remove in prod
+                      // ignore: avoid_print
                       print(_formkey.currentState?.value);
+                      //TODO Remove in prod
+                      // ignore: avoid_print
                       print('validation failed');
                     }
                   },
@@ -172,8 +233,10 @@ class _CreateTransactionModalState extends State<CreateTransactionModal> {
                 child: OutlinedButton(
                   onPressed: () {
                     _formkey.currentState?.reset();
+                    setState(() {
+                      creditorDebtorLabel = "";
+                    });
                   },
-                  // color: Theme.of(context).colorScheme.secondary,
                   child: Text(
                     'Reset',
                     style: TextStyle(

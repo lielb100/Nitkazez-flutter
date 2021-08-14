@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nitkazez/components/TransactionTile.dart';
-import '../models/Transaction.dart' as local;
-import 'package:nitkazez/providers/UserProvider.dart';
-import 'package:provider/provider.dart';
+import 'package:nitkazez/components/transaction_tile.dart';
+import '../models/transaction.dart' as local;
 
 class TransactionList extends StatefulWidget {
   const TransactionList({Key? key, required this.ledgerRefrence})
@@ -14,6 +12,7 @@ class TransactionList extends StatefulWidget {
 }
 
 class _TransactionListState extends State<TransactionList> {
+  // ignore: unused_field
   late Stream<QuerySnapshot> _transactionsStream;
 
   @override
@@ -25,15 +24,13 @@ class _TransactionListState extends State<TransactionList> {
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Text("Something went wrong");
+            return const Text("Something went wrong");
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Text("Loading");
+            return const Text("Loading");
           }
-          final userChange = Provider.of<UserProvider>(context);
-
-          return new ListView(
+          return ListView(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;

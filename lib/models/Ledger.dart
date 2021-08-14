@@ -1,29 +1,33 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'Transaction.dart' as local;
+import 'package:cloud_firestore/cloud_firestore.dart'
+    show CollectionReference, DocumentReference, FirebaseFirestore, Timestamp;
 
 class Ledger {
-  String _ledgerId;
-  List<DocumentReference<Map<String, dynamic>>> _members;
-  String _ledgerName;
-  CollectionReference _transactions;
-  String _creatorId;
-  Timestamp _createdAt;
-  Ledger(this._ledgerId, this._ledgerName, this._members, this._transactions,
-      this._createdAt, this._creatorId);
+  late String ledgerId;
+  late List<DocumentReference<Map<String, dynamic>>> members;
+  late String ledgerName;
+  late CollectionReference transactions;
+  late String creatorId;
+  late Timestamp createdAt;
+  Ledger(this.ledgerId, this.ledgerName, this.members, this.transactions,
+      this.createdAt, this.creatorId);
 
   Ledger.fromSnapshot(String id, Map snapshot)
-      : _ledgerId = id,
-        _members = (snapshot['members'] as List<dynamic>)
+      : ledgerId = id,
+        members = (snapshot['members'] as List<dynamic>)
             .map((e) => e as DocumentReference<Map<String, dynamic>>)
             .toList(),
-        _ledgerName = snapshot['ledgerName'],
-        _transactions = FirebaseFirestore.instance
+        ledgerName = snapshot['ledgerName'],
+        transactions = FirebaseFirestore.instance
             .collection("ledgers")
             .doc(id)
             .collection("transactions"),
-        _creatorId = snapshot['creatorId'],
-        _createdAt = snapshot["createdAt"];
+        creatorId = snapshot['creatorId'],
+        createdAt = snapshot["createdAt"];
 
-  get members => this._members;
+  Map<String, dynamic> toMap() => {
+        "createdAt": createdAt,
+        "creatorId": creatorId,
+        "ledgerName": ledgerName,
+        "members": members,
+      };
 }

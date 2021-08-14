@@ -2,25 +2,30 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:nitkazez/providers/UserProvider.dart';
-import 'package:nitkazez/screens/HomeScreen.dart';
-import 'package:nitkazez/screens/LoginScreen.dart';
-import 'package:nitkazez/providers/DarkThemeProvider.dart';
-import 'package:nitkazez/theme/Styles.dart';
+import 'package:flutter/services.dart';
+import 'package:nitkazez/providers/user_provider.dart';
+import 'package:nitkazez/screens/home_screen.dart';
+import 'package:nitkazez/screens/login_screen.dart';
+import 'package:nitkazez/providers/dark_theme_provider.dart';
+import 'package:nitkazez/theme/styles.dart';
 import 'package:provider/provider.dart';
-import 'models/User.dart' as UserModel;
+import 'models/user.dart' as user_model;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // ignore: unused_local_variable
   FirebaseAnalytics analytics = FirebaseAnalytics();
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return InitializerWidget();
+    return const InitializerWidget();
   }
 }
 
@@ -65,7 +70,7 @@ class _InitializerWidgetState extends State<InitializerWidget> {
   Widget build(BuildContext context) {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null) {
-        userChangeProvider.currentUser = UserModel.User("", "");
+        userChangeProvider.currentUser = user_model.User("", "");
       } else {
         getCurrentUser(user.uid);
       }
@@ -90,14 +95,14 @@ class _InitializerWidgetState extends State<InitializerWidget> {
               theme: Styles.themeData(themeChangeProvider.darkTheme, context),
               debugShowCheckedModeBanner: true,
               home: isLoading
-                  ? Scaffold(
+                  ? const Scaffold(
                       body: Center(
                         child: CircularProgressIndicator(),
                       ),
                     )
                   : _user == null
                       ? LoginScreen()
-                      : HomeScreen());
+                      : const HomeScreen());
         },
       ),
     );

@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nitkazez/models/User.dart' as UserModel;
-import 'package:nitkazez/providers/UserProvider.dart';
-import 'package:nitkazez/providers/DarkThemeProvider.dart';
+import 'package:nitkazez/models/user.dart' as user_model;
+import 'package:nitkazez/providers/user_provider.dart';
+import 'package:nitkazez/providers/dark_theme_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'LoginScreen.dart';
+import 'login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -15,7 +15,7 @@ class SettingsScreen extends StatelessWidget {
     var _auth = FirebaseAuth.instance;
     return Scaffold(
         appBar: AppBar(
-          title: Text("Settings"),
+          title: const Text("Settings"),
           centerTitle: true,
         ),
         body: ListView(
@@ -24,8 +24,8 @@ class SettingsScreen extends StatelessWidget {
               height: 48,
             ),
             ListTile(
-              leading: Icon(Icons.brush),
-              title: Text("Theme"),
+              leading: const Icon(Icons.brush),
+              title: const Text("Theme"),
               onTap: () => themeChange.darkTheme = !themeChange.darkTheme,
               trailing: Switch(
                 onChanged: (bool value) {
@@ -38,10 +38,10 @@ class SettingsScreen extends StatelessWidget {
               height: 48,
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Logout"),
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
               onTap: () async {
-                userChange.currentUser = UserModel.User("", "");
+                userChange.currentUser = user_model.User("", "");
                 _auth.signOut();
                 Navigator.pop(context);
                 Navigator.pushReplacement(context,
@@ -50,6 +50,5 @@ class SettingsScreen extends StatelessWidget {
             )
           ],
         ));
-    ;
   }
 }

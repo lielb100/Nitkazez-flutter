@@ -1,16 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'Ledger.dart';
-
 class User {
-  String _uid;
-  String _userName;
+  String? uid;
+  String? userName;
 
-  User(this._uid, this._userName) {}
+  User(this.uid, this.userName);
+
+  User.fromObject({this.uid, this.userName});
 
   User.fromSnapshot(String id, Map<String, dynamic> snapshot)
-      : _uid = id,
-        _userName = snapshot['userName'];
+      : uid = id,
+        userName = snapshot['userName'];
 
   double get balance => 0.0;
   // Future<double> get balance async {
@@ -38,18 +38,19 @@ class User {
   //   return balance;
   // }
 
-  set userName(String value) {
-    this._userName = value;
+  List<User> userListFromSnapshot(querySnapshot) {
+    return querySnapshot.docs.map((snapshot) {
+      final Map<String, dynamic> dataMap = snapshot.data();
+
+      return User.fromSnapshot(snapshot.id, dataMap);
+    }).toList();
   }
 
-  set uid(String value) {
-    this._uid = value;
+  DocumentReference<Map<String, dynamic>> get docRef {
+    return FirebaseFirestore.instance.collection("users").doc(uid);
   }
-
-  String get uid => this._uid;
-  String get userName => this._userName;
 
   static DocumentReference<Map<String, dynamic>> toDocRef(User user) {
-    return FirebaseFirestore.instance.collection("users").doc(user._uid);
+    return FirebaseFirestore.instance.collection("users").doc(user.uid);
   }
 }

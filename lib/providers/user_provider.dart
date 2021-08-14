@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import '../models/User.dart' as UserModel;
+import '../models/user.dart' as UserModel;
 
 class UserProvider extends ChangeNotifier {
   late UserModel.User currentUser;
 
   UserProvider() {
-    this.currentUser = UserModel.User("", "");
+    currentUser = UserModel.User("", "");
   }
 
   UserModel.User userFromFirebase(Map<String, dynamic> data, String uid) {
@@ -29,7 +29,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   int generateEightDigitNumber() {
-    var rnd = new Random();
+    var rnd = Random();
     var next = rnd.nextDouble() * 100000000;
     while (next < 10000000) {
       next *= 10;
@@ -49,7 +49,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<UserModel.User> createUser(String uid) async {
-    String userName = 'user' + this.generateEightDigitNumber().toString();
+    String userName = 'user' + generateEightDigitNumber().toString();
     UserModel.User user = UserModel.User(uid, userName);
     await FirebaseFirestore.instance.collection('users').doc(uid).set({
       'userName': userName,
@@ -59,17 +59,17 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> updateUserName(String userName) async {
-    this.currentUser.userName = userName;
+    currentUser.userName = userName;
     await FirebaseFirestore.instance
         .collection('users')
-        .doc(this.currentUser.uid)
+        .doc(currentUser.uid)
         .update({'userName': userName}).catchError(
             (error) => print('Failed to update user: $error'));
     notifyListeners();
   }
 
   double get balance {
-    double balance = this.currentUser.balance;
+    double balance = currentUser.balance;
     return balance;
   }
 }

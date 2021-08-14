@@ -33,9 +33,10 @@ class Styles {
       hoverColor: isDarkTheme ? lightColor : darkColor,
       focusColor: isDarkTheme ? lightColor : darkColor,
       disabledColor: Colors.grey,
-      cardColor: isDarkTheme ? Color(0xFF151515) : Colors.white,
+      cardColor: isDarkTheme ? const Color(0xFF151515) : Colors.white,
       canvasColor: isDarkTheme ? Colors.black : Colors.grey[50],
       brightness: isDarkTheme ? Brightness.dark : Brightness.light,
+      dividerColor: isDarkTheme ? darkColor : lightColor,
       floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: isDarkTheme ? darkColor : lightColor),
       textSelectionTheme: TextSelectionThemeData(

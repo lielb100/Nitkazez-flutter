@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nitkazez/models/Transaction.dart' as local;
-import 'package:nitkazez/models/User.dart';
-import 'package:nitkazez/providers/UserProvider.dart';
+import 'package:nitkazez/models/transaction.dart' as local;
+import 'package:nitkazez/models/user.dart';
+import 'package:nitkazez/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class TransactionTile extends StatefulWidget {
   final local.Transaction transaction;
 
-  const TransactionTile({Key? key, required local.Transaction this.transaction})
+  const TransactionTile({Key? key, required this.transaction})
       : super(key: key);
 
   @override
@@ -37,10 +37,10 @@ class _TransactionTileState extends State<TransactionTile> {
         if (snapshot.hasData) {
           User _creditor = snapshot.data![0];
           User _debtor = snapshot.data![1];
-          String _creditorName = _creditor.uid == userChange.currentUser.uid
+          String? _creditorName = _creditor.uid == userChange.currentUser.uid
               ? 'you'
               : _creditor.userName;
-          String _debtorName = _debtor.uid == userChange.currentUser.uid
+          String? _debtorName = _debtor.uid == userChange.currentUser.uid
               ? 'you'
               : _debtor.userName;
           tile = ListTile(
@@ -48,7 +48,7 @@ class _TransactionTileState extends State<TransactionTile> {
             subtitle: Text(
                 "${widget.transaction.amount} ${widget.transaction.currency} from $_creditorName to $_debtorName"),
             trailing: IconButton(
-              icon: Icon(Icons.edit_outlined),
+              icon: const Icon(Icons.edit_outlined),
               onPressed: () {
                 debugPrint(widget.transaction.toString());
               },
@@ -56,11 +56,11 @@ class _TransactionTileState extends State<TransactionTile> {
           );
         } else if (snapshot.hasError) {
           tile = ListTile(
-            title: Text('Error'),
+            title: const Text('Error'),
             subtitle: Text('${snapshot.error}'),
           );
         } else {
-          tile = ListTile(
+          tile = const ListTile(
             title: CircularProgressIndicator(),
           );
         }

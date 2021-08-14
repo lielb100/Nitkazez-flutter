@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nitkazez/models/User.dart';
-import 'package:nitkazez/providers/UserProvider.dart';
+import 'package:nitkazez/models/user.dart';
+import 'package:nitkazez/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -20,10 +20,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String warning = '';
   Widget buildOwnProfile(BuildContext context) {
     final userChange = Provider.of<UserProvider>(context);
+    // ignore: unused_local_variable
     bool isInEditMode = false;
     return Scaffold(
         appBar: AppBar(
-          title: Text("Info"),
+          title: const Text("Info"),
           centerTitle: true,
         ),
         body: Padding(
@@ -32,11 +33,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               children: [
                 Text(
-                  userChange.currentUser.userName,
-                  style: TextStyle(fontSize: 30),
+                  userChange.currentUser.userName ?? "",
+                  style: const TextStyle(fontSize: 30),
                 ),
                 editMode(context),
-                Text("Balance:"),
+                const Text("Balance:"),
                 Text(widget.user!.balance.toString())
               ],
             ),
@@ -51,6 +52,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .where("userName", isEqualTo: userName)
         .get()
         .catchError((error) {
+      //TODO Remove in prod
+      // ignore: avoid_print
       print("error: $error");
       check = false;
     });
@@ -79,7 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   userName = value!.trim();
                 });
               },
-              decoration: InputDecoration(labelText: "User Name"),
+              decoration: const InputDecoration(labelText: "User Name"),
               validator: (value) {
                 late String s;
                 final validCharacters =
@@ -87,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (value == null || value.trim().isEmpty) {
                   s = 'Please enter some text';
                   setState(() {
-                    this.warning = s;
+                    warning = s;
                   });
                   return s;
                 } else {
@@ -95,19 +98,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   if (name.length < 6) {
                     s = 'User Name must be longer than six characters';
                     setState(() {
-                      this.warning = s;
+                      warning = s;
                     });
                     return s;
                   } else if (!validCharacters.hasMatch(name)) {
                     s = 'Alphanumeric characters only';
                     setState(() {
-                      this.warning = s;
+                      warning = s;
                     });
                     return s;
                   } else if (duplicate) {
                     s = 'This username is already taken';
                     setState(() {
-                      this.warning = s;
+                      warning = s;
                     });
                     return s;
                   }
@@ -124,11 +127,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       });
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        if (await this.isNameUnique(this.userName)) {
-                          userChange.updateUserName(this.userName);
+                        if (await isNameUnique(userName)) {
+                          userChange.updateUserName(userName);
                           setState(() {
-                            this.isInEditMode = false;
-                            this.warning = "";
+                            isInEditMode = false;
+                            warning = "";
                           });
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -141,22 +144,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         }
                       }
                     },
-                    icon: Icon(Icons.save, color: Colors.green),
-                    label: Text("SAVE")),
+                    icon: const Icon(Icons.save, color: Colors.green),
+                    label: const Text("SAVE")),
                 TextButton.icon(
                     onPressed: () {
                       setState(() {
                         isInEditMode = false;
                       });
                     },
-                    icon: Icon(Icons.cancel, color: Colors.red),
-                    label: Text("CANCEL")),
+                    icon: const Icon(Icons.cancel, color: Colors.red),
+                    label: const Text("CANCEL")),
               ],
             ),
             Center(
-              child: this.warning.isNotEmpty
-                  ? Text(this.warning,
-                      style: TextStyle(
+              child: warning.isNotEmpty
+                  ? Text(warning,
+                      style: const TextStyle(
                           color: Colors.red, fontStyle: FontStyle.italic))
                   : null,
             )
@@ -170,8 +173,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             isInEditMode = true;
           });
         },
-        label: Text("EDIT"),
-        icon: Icon(Icons.edit),
+        label: const Text("EDIT"),
+        icon: const Icon(Icons.edit),
       );
     }
   }
@@ -179,12 +182,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget buildOtherProfile(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Info"),
+          title: const Text("Info"),
           centerTitle: true,
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Text("Balance:"), Text(widget.user!.balance.toString())],
+          children: [
+            const Text("Balance:"),
+            Text(widget.user!.balance.toString())
+          ],
         ));
   }
 

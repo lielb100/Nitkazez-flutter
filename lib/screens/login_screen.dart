@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nitkazez/screens/HomeScreen.dart';
+import 'package:nitkazez/screens/home_screen.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 enum MobileVerificationState {
-  SHOW_MOBILE_FORM_STATE,
-  SHOW_OTP_FORM_STATE,
+  showMobileFormState,
+  showOtpFormState,
 }
 
 class LoginScreen extends StatefulWidget {
@@ -16,13 +16,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   MobileVerificationState currentState =
-      MobileVerificationState.SHOW_MOBILE_FORM_STATE;
+      MobileVerificationState.showMobileFormState;
 
   // final phoneController = TextEditingController();
   String verificationCode = '';
   String phoneNumber = '';
 
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   String verificationId = '';
 
@@ -43,8 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       if (authCredential.user != null) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()));
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
   getMobileFormWidget(BuildContext context) {
     return Column(
       children: [
-        Spacer(),
+        const Spacer(),
         // TextField(
         //   controller: phoneController,
         //   decoration: InputDecoration(
@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
         //   ),
         // ),
         IntlPhoneField(
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Phone Number',
             border: OutlineInputBorder(
               borderSide: BorderSide(),
@@ -80,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
             });
           },
         ),
-        SizedBox(
+        const SizedBox(
           height: 16,
         ),
         TextButton(
@@ -108,15 +108,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 codeSent: (verificatoinId, resendingToken) async {
                   setState(() {
                     showLoading = false;
-                    currentState = MobileVerificationState.SHOW_OTP_FORM_STATE;
-                    this.verificationId = verificatoinId;
+                    currentState = MobileVerificationState.showOtpFormState;
+                    verificationId = verificatoinId;
                   });
                 },
                 codeAutoRetrievalTimeout: (verificationId) async {},
               );
             },
-            child: Text("Send")),
-        Spacer(),
+            child: const Text("Send")),
+        const Spacer(),
       ],
     );
   }
@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
   getOtpFormWidget(BuildContext context) {
     return Column(
       children: [
-        Spacer(),
+        const Spacer(),
         PinCodeTextField(
           appContext: context,
           length: 6,
@@ -142,20 +142,20 @@ class _LoginScreenState extends State<LoginScreen> {
         //   ),
         //   keyboardType: TextInputType.number,
         // ),
-        SizedBox(
+        const SizedBox(
           height: 16,
         ),
         TextButton(
             onPressed: () async {
               PhoneAuthCredential phoneAuthCredential =
                   PhoneAuthProvider.credential(
-                      verificationId: this.verificationId,
-                      smsCode: this.verificationCode);
+                      verificationId: verificationId,
+                      smsCode: verificationCode);
 
               signInWithPhoneAuthCredential(phoneAuthCredential);
             },
-            child: Text("Verify")),
-        Spacer(),
+            child: const Text("Verify")),
+        const Spacer(),
       ],
     );
   }
@@ -165,10 +165,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
         body: Container(
       child: showLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
-          : currentState == MobileVerificationState.SHOW_MOBILE_FORM_STATE
+          : currentState == MobileVerificationState.showMobileFormState
               ? getMobileFormWidget(context)
               : getOtpFormWidget(context),
       padding: const EdgeInsets.all(16),

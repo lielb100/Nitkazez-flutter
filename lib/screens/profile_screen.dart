@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nitkazez/components/user_avatar.dart';
 import 'package:nitkazez/models/user.dart';
 import 'package:nitkazez/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -22,9 +24,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userChange = Provider.of<UserProvider>(context);
     // ignore: unused_local_variable
     bool isInEditMode = false;
+    var balance2 = userChange.currentUser.balance;
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Info"),
+          title: const Text("Profile"),
           centerTitle: true,
         ),
         body: Padding(
@@ -32,17 +35,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Center(
             child: Column(
               children: [
+                Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: UserAvatar(
+                      userName: userChange.currentUser.userName!,
+                      radius: MediaQuery.of(context).size.width / 3,
+                      showUnderText: false,
+                    )),
+                // const Text(
+                //   "User Name:",
+                //   style: TextStyle(fontSize: 20),
+                // ),
                 Text(
                   userChange.currentUser.userName ?? "",
                   style: const TextStyle(fontSize: 30),
                 ),
                 editMode(context),
-                const Text("Balance:"),
-                Text(widget.user!.balance.toString())
+                const Text(
+                  "Balance:",
+                  style: TextStyle(fontSize: 20),
+                ),
+                Text(
+                  balance2.toString(),
+                  style: TextStyle(color: balanceColor(balance2), fontSize: 30),
+                )
               ],
             ),
           ),
         ));
+  }
+
+  Color balanceColor(double balance) {
+    if (balance > 0) {
+      return Colors.green;
+    }
+    if (balance < 0) {
+      return Colors.red;
+    }
+    return Colors.black;
   }
 
   Future<bool> isNameUnique(String userName) async {
@@ -182,21 +212,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget buildOtherProfile(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Info"),
+          title: const Text("Profile"),
           centerTitle: true,
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("Balance:"),
-            Text(widget.user!.balance.toString())
-          ],
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Column(
+              children: [
+                Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: UserAvatar(
+                      userName: widget.user!.userName!,
+                      radius: MediaQuery.of(context).size.width / 3,
+                      showUnderText: false,
+                    )),
+                // const Text(
+                //   "User Name:",
+                //   style: TextStyle(fontSize: 20),
+                // ),
+                Text(
+                  widget.user!.userName ?? "",
+                  style: const TextStyle(fontSize: 30),
+                ),
+              ],
+            ),
+          ),
         ));
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.user == null
+    final userChange = Provider.of<UserProvider>(context);
+    return widget.user == null || widget.user!.uid == userChange.currentUser.uid
         ? buildOwnProfile(context)
         : buildOtherProfile(context);
   }

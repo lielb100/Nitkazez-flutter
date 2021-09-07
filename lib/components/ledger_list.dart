@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nitkazez/models/ledger.dart';
 import '../screens/ledger_screen.dart';
 
 class LedgerList extends StatefulWidget {
@@ -54,9 +56,22 @@ class _LedgerListState extends State<LedgerList> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => LedgerScreen(
-                                ledger: document,
+                                ledger: Ledger.fromSnapshot(document.id, data),
                               )));
                 },
+                leading: CachedNetworkImage(
+                  imageUrl:
+                      "https://picsum.photos/seed/${data['ledgerName']}/300/300",
+                  imageBuilder: (context, imageProvider) => CircleAvatar(
+                    foregroundImage: imageProvider,
+                    radius: 40.0,
+                  ),
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => CircleAvatar(
+                    child: Text(widget.userName[0].toUpperCase()),
+                    radius: 40.0,
+                  ),
+                ),
                 title: Text(data['ledgerName']),
               );
             }).toList(),

@@ -10,7 +10,7 @@ class Ledger {
   late Timestamp createdAt;
   Ledger(this.ledgerId, this.ledgerName, this.members, this.transactions,
       this.createdAt, this.creatorId);
-
+  Ledger.create(this.ledgerName, this.members, this.createdAt, this.creatorId);
   Ledger.fromSnapshot(String id, Map snapshot)
       : ledgerId = id,
         members = (snapshot['members'] as List<dynamic>)

@@ -1,24 +1,26 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nitkazez/components/user_avatar.dart';
+import 'package:nitkazez/providers/user_provider.dart';
 import 'package:nitkazez/screens/info_screen.dart';
 import 'package:nitkazez/screens/profile_screen.dart';
 import 'package:nitkazez/screens/settings_screen.dart';
+import 'package:provider/provider.dart';
 
 class NavigationDrawer extends StatelessWidget {
   final padding = const EdgeInsets.symmetric(horizontal: 20);
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
-    const urlImage =
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
+    final userChange = Provider.of<UserProvider>(context);
+
     return Drawer(
       child: Material(
         // color: Colors.tealAccent[700],
         child: ListView(
           children: <Widget>[
             buildHeader(
-              urlImage: urlImage,
-              phoneNumber: _auth.currentUser!.phoneNumber,
+              userName: userChange.currentUser.userName!,
               onClicked: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const ProfileScreen(),
@@ -43,22 +45,6 @@ class NavigationDrawer extends StatelessWidget {
             ),
           ],
         ),
-        // child: ListView(
-        //   padding: EdgeInsets.zero,
-        //   children: [
-        //     DrawerHeader(
-        //       child: Text((_auth.currentUser!.phoneNumber?.toString())!),
-        //       decoration: BoxDecoration(),
-        //     ),
-        //     ListTile(
-        //       title: const Text("Profile"),
-        //       onTap: () {},
-        //     ),
-        //     ListTile(
-        //       title: const Text("Settings"),
-        //     ),
-        //   ],
-        // ),
       ),
     );
   }
@@ -96,22 +82,23 @@ class NavigationDrawer extends StatelessWidget {
     }
   }
 
-  buildHeader(
-          {required String urlImage,
-          required String? phoneNumber,
-          required VoidCallback onClicked}) =>
+  buildHeader({required String userName, required VoidCallback onClicked}) =>
       InkWell(
         onTap: onClicked,
         child: Container(
           padding: padding.add(const EdgeInsets.symmetric(vertical: 40)),
           child: Row(
             children: [
-              CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage)),
+              UserAvatar(
+                userName: userName,
+                radius: 40.0,
+                showUnderText: false,
+              ),
               const SizedBox(
                 width: 20,
               ),
               Text(
-                phoneNumber!,
+                userName,
                 style: const TextStyle(fontSize: 20),
               ),
             ],

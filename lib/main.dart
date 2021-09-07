@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nitkazez/providers/ledger_members_provider.dart';
 import 'package:nitkazez/providers/user_provider.dart';
 import 'package:nitkazez/screens/home_screen.dart';
 import 'package:nitkazez/screens/login_screen.dart';
@@ -41,6 +42,7 @@ class _InitializerWidgetState extends State<InitializerWidget> {
   UserProvider userChangeProvider = UserProvider();
   bool isLoading = true;
   DarkThemeProvider themeChangeProvider = DarkThemeProvider();
+  LedgerMembersProvider ledgerMembersChangeProvider = LedgerMembersProvider();
 
   @override
   void initState() {
@@ -87,6 +89,9 @@ class _InitializerWidgetState extends State<InitializerWidget> {
             return userChangeProvider;
           },
         ),
+        // ChangeNotifierProvider(create: (_) {
+        //   return ledgerMembersChangeProvider;
+        // })
       ],
       child: Consumer<DarkThemeProvider>(
         builder: (BuildContext context, value, Widget? child) {

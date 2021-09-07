@@ -39,7 +39,7 @@ class User {
   // }
 
   List<User> userListFromSnapshot(querySnapshot) {
-    return querySnapshot.docs.map((snapshot) {
+    return querySnapshot.docs.map<User>((snapshot) {
       final Map<String, dynamic> dataMap = snapshot.data();
 
       return User.fromSnapshot(snapshot.id, dataMap);

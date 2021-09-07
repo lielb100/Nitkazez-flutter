@@ -60,4 +60,12 @@ class Transaction {
     isDebtorApprovedAdded = false;
     isCreditorApprovedAdded = false;
   }
+
+  bool get completed {
+    return isDebtorApprovedPaid! && isCreditorApprovedPaid! ? true : false;
+  }
+
+  bool get Approved {
+    return isDebtorApprovedAdded! && isCreditorApprovedAdded! ? true : false;
+  }
 }

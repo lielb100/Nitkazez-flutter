@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nitkazez/components/transaction_tile.dart';
+import 'package:nitkazez/components/approved_transaction_tile.dart';
+import 'package:nitkazez/components/completed_transaction_tile%20copy.dart';
+import 'package:nitkazez/components/pending_transaction_tile.dart';
+import 'package:nitkazez/models/ledger.dart';
 import '../models/transaction.dart' as local;
 
 class TransactionList extends StatefulWidget {
-  const TransactionList({Key? key, required this.ledgerRefrence})
-      : super(key: key);
-  final DocumentReference ledgerRefrence;
+  const TransactionList({Key? key, required this.ledger}) : super(key: key);
+  final Ledger ledger;
   @override
   _TransactionListState createState() => _TransactionListState();
 }
@@ -18,7 +20,9 @@ class _TransactionListState extends State<TransactionList> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-        stream: _transactionsStream = widget.ledgerRefrence
+        stream: _transactionsStream = FirebaseFirestore.instance
+            .collection("ledgers")
+            .doc(widget.ledger.ledgerId)
             .collection("transactions")
             .orderBy('time', descending: true)
             .snapshots(),
@@ -34,9 +38,13 @@ class _TransactionListState extends State<TransactionList> {
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
-              return TransactionTile(
-                  transaction:
-                      local.Transaction.fromSnapshot(document.id, data));
+              local.Transaction transaction =
+                  local.Transaction.fromSnapshot(document.id, data);
+              return transaction.completed
+                  ? CompletedTransactionTile(transaction: transaction)
+                  : transaction.Approved
+                      ? ApprovedTransactionTile(transaction: transaction)
+                      : PendingTransactionTile(transaction: transaction);
             }).toList(),
 
             /*           children: snapshot.data!.docs.map((DocumentSnapshot document) {

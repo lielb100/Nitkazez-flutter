@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:nitkazez/models/ledger.dart';
 import 'package:nitkazez/models/user.dart';
+import 'package:nitkazez/providers/members_controller.dart';
 import 'package:nitkazez/providers/user_provider.dart';
 import 'package:nitkazez/screens/modals/add_ledger_steps/second_step.dart';
 import 'package:nitkazez/screens/modals/add_ledger_steps/first_step.dart';
 import 'package:provider/provider.dart';
+
+import '../ledger_screen.dart';
 
 class CreateLedgerModal extends StatefulWidget {
   CreateLedgerModal({Key? key}) : super(key: key);
@@ -18,17 +22,15 @@ class _CreateLedgerModalState extends State<CreateLedgerModal> {
   final _formsPageViewController = PageController();
   late List _forms;
   late Ledger _ledger;
-  List<User> _members = [];
-  String _ledgerName = "";
+  // LedgerMembersProvider ledgerMembersProvider = LedgerMembersProvider();
+  MembersController membersController = Get.put(MembersController());
 
   @override
   Widget build(BuildContext context) {
-    final userChange = Provider.of<UserProvider>(context);
-
     _forms = [
       WillPopScope(
         onWillPop: () => Future.sync(onWillPop),
-        child: AddLedgerFirstStep(_members, _nextFormStep),
+        child: AddLedgerFirstStep(_nextFormStep),
       ),
       WillPopScope(
         onWillPop: () => Future.sync(onWillPop),
@@ -36,14 +38,12 @@ class _CreateLedgerModalState extends State<CreateLedgerModal> {
       ),
     ];
 
-    return Expanded(
-      child: PageView.builder(
-        controller: _formsPageViewController,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (BuildContext context, int index) {
-          return _forms[index];
-        },
-      ),
+    return PageView.builder(
+      controller: _formsPageViewController,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (BuildContext context, int index) {
+        return _forms[index];
+      },
     );
   }
 
@@ -54,11 +54,35 @@ class _CreateLedgerModalState extends State<CreateLedgerModal> {
     );
   }
 
-  void _submit() {
-    _ledger.members = _members.map((e) => e.docRef).toList();
-    _ledger.createdAt = Timestamp.now();
-    _ledger.ledgerName = _ledgerName;
-    FirebaseFirestore.instance.collection("ledgers").add(_ledger.toMap());
+  Future<String> _submit(String name) async {
+    final userChange = Provider.of<UserProvider>(context, listen: false);
+    MembersController membersController = Get.find();
+
+    membersController.members.add(userChange.currentUser);
+    _ledger = Ledger.create(
+        name,
+        membersController.members.map((User user) => user.docRef).toList(),
+        Timestamp.now(),
+        userChange.currentUser.uid!);
+    var returnVal;
+    await FirebaseFirestore.instance
+        .collection("ledgers")
+        .add(_ledger.toMap())
+        .then((value) {
+      returnVal = value.id;
+      _ledger.ledgerId = value.id;
+      _formsPageViewController.dispose();
+      Navigator.pop(context);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => LedgerScreen(
+                    ledger: _ledger,
+                  )));
+    }).catchError((error, stackTrace) {
+      returnVal = error.toString();
+    });
+    return returnVal;
   }
 
   bool onWillPop() {

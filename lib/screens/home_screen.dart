@@ -33,6 +33,9 @@ class _HomeScreenState extends State<HomeScreen> {
           //TODO fix settings logout and replace this with one add button
           Row(
         children: [
+          const SizedBox(
+            width: 40,
+          ),
           ElevatedButton(
             onPressed: () async {
               _auth.signOut();
@@ -40,6 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(builder: (context) => LoginScreen()));
             },
             child: const Icon(Icons.logout),
+          ),
+          const SizedBox(
+            width: 10,
           ),
           ElevatedButton(
               onPressed: () {
